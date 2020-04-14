@@ -6,7 +6,7 @@
 import 'vs/css!./media/scmViewlet';
 import { localize } from 'vs/nls';
 import { Event, Emitter } from 'vs/base/common/event';
-import { basename } from 'vs/base/common/resources';
+// import { basename } from 'vs/base/common/resources';
 import { IDisposable, dispose, Disposable, DisposableStore, combinedDisposable } from 'vs/base/common/lifecycle';
 import { ViewPane, IViewPaneOptions } from 'vs/workbench/browser/parts/views/viewPaneContainer';
 import { append, $, toggleClass } from 'vs/base/browser/dom';
@@ -134,7 +134,7 @@ class ProviderRenderer implements IListRenderer<ISCMRepository, RepositoryTempla
 		const disposables = new DisposableStore();
 
 		if (repository.provider.rootUri) {
-			templateData.title.textContent = basename(repository.provider.rootUri);
+			templateData.title.textContent = repository.provider.rootUri.path;
 			templateData.type.textContent = repository.provider.label;
 		} else {
 			templateData.title.textContent = repository.provider.label;

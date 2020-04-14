@@ -658,7 +658,7 @@ export class RepositoryPane extends ViewPane {
 		let type: string;
 
 		if (this.repository.provider.rootUri) {
-			title = basename(this.repository.provider.rootUri);
+			title = this.repository.provider.rootUri.path;
 			type = this.repository.provider.label;
 		} else {
 			title = this.repository.provider.label;
