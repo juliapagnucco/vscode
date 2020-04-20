@@ -96,10 +96,13 @@ export interface ISCMRepository extends IDisposable {
 	readonly onDidFocus: Event<void>;
 	readonly selected: boolean;
 	readonly onDidChangeSelection: Event<boolean>;
+	readonly name: string;
+	readonly onDidChangeName: Event<string>;
 	readonly provider: ISCMProvider;
 	readonly input: ISCMInput;
 	focus(): void;
 	setSelected(selected: boolean): void;
+	setName(name: string): void;
 }
 
 export interface ISCMService {

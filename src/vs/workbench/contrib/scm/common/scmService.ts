@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import { shorten } from 'vs/base/common/labels';
 import { IDisposable, toDisposable } from 'vs/base/common/lifecycle';
 import { Event, Emitter } from 'vs/base/common/event';
 import { ISCMService, ISCMProvider, ISCMInput, ISCMRepository, IInputValidator } from './scm';
@@ -85,6 +86,14 @@ class SCMRepository implements ISCMRepository {
 	private readonly _onDidChangeSelection = new Emitter<boolean>();
 	readonly onDidChangeSelection: Event<boolean> = this._onDidChangeSelection.event;
 
+	private _name = '';
+	get name(): string {
+		return this._name;
+	}
+
+	private readonly _onDidChangeName = new Emitter<string>();
+	readonly onDidChangeName: Event<string> = this._onDidChangeName.event;
+
 	readonly input: ISCMInput = new SCMInput();
 
 	constructor(
@@ -103,6 +112,16 @@ class SCMRepository implements ISCMRepository {
 
 		this._selected = selected;
 		this._onDidChangeSelection.fire(selected);
+	}
+
+
+	setName(name: string): void {
+		if (this._name === name) {
+			return;
+		}
+
+		this._name = name;
+		this._onDidChangeName.fire(name);
 	}
 
 	dispose(): void {
@@ -161,6 +180,9 @@ export class SCMService implements ISCMService {
 
 		this._repositories.push(repository);
 		this._onDidAddProvider.fire(repository);
+
+		const names = shorten(this.repositories.map(r => r.provider.rootUri?.path ?? r.provider.label));
+		this.repositories.forEach((r, i) => r.setName(names[i]));
 
 		return repository;
 	}

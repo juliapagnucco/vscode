@@ -654,16 +654,8 @@ export class RepositoryPane extends ViewPane {
 	}
 
 	protected renderHeaderTitle(container: HTMLElement): void {
-		let title: string;
-		let type: string;
-
-		if (this.repository.provider.rootUri) {
-			title = this.repository.provider.rootUri.path;
-			type = this.repository.provider.label;
-		} else {
-			title = this.repository.provider.label;
-			type = '';
-		}
+		let title = this.repository.name;
+		let type = this.repository.provider.rootUri ? this.repository.provider.label : '';
 
 		super.renderHeaderTitle(container, title);
 		addClass(container, 'scm-provider');

@@ -133,13 +133,8 @@ class ProviderRenderer implements IListRenderer<ISCMRepository, RepositoryTempla
 		templateData.disposable.dispose();
 		const disposables = new DisposableStore();
 
-		if (repository.provider.rootUri) {
-			templateData.title.textContent = repository.provider.rootUri.path;
-			templateData.type.textContent = repository.provider.label;
-		} else {
-			templateData.title.textContent = repository.provider.label;
-			templateData.type.textContent = '';
-		}
+		templateData.title.textContent = repository.name;
+		templateData.type.textContent = repository.provider.rootUri ? repository.provider.label : '';
 
 		const actions: IAction[] = [];
 		const disposeActions = () => dispose(actions);
@@ -210,7 +205,6 @@ export class MainPane extends ViewPane {
 				listBackground: SIDE_BAR_BACKGROUND
 			}
 		});
-
 		this._register(renderer.onDidRenderElement(e => this.list.updateWidth(this.viewModel.repositories.indexOf(e)), null));
 		this._register(this.list.onDidChangeSelection(this.onListSelectionChange, this));
 		this._register(this.list.onDidChangeFocus(this.onListFocusChange, this));
