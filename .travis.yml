@@ -13,7 +13,7 @@ before_install:
     fi
 
 install: 
-  - yarn install
+  - yarn install 10.2 
   - yarn run vscode:prepublish
 
 script:
