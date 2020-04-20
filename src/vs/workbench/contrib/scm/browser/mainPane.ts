@@ -6,7 +6,6 @@
 import 'vs/css!./media/scmViewlet';
 import { localize } from 'vs/nls';
 import { Event, Emitter } from 'vs/base/common/event';
-// import { basename } from 'vs/base/common/resources';
 import { IDisposable, dispose, Disposable, DisposableStore, combinedDisposable } from 'vs/base/common/lifecycle';
 import { ViewPane, IViewPaneOptions } from 'vs/workbench/browser/parts/views/viewPaneContainer';
 import { append, $, toggleClass } from 'vs/base/browser/dom';
@@ -205,6 +204,7 @@ export class MainPane extends ViewPane {
 				listBackground: SIDE_BAR_BACKGROUND
 			}
 		});
+
 		this._register(renderer.onDidRenderElement(e => this.list.updateWidth(this.viewModel.repositories.indexOf(e)), null));
 		this._register(this.list.onDidChangeSelection(this.onListSelectionChange, this));
 		this._register(this.list.onDidChangeFocus(this.onListFocusChange, this));

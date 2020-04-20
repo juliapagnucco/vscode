@@ -3,10 +3,10 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { shorten } from 'vs/base/common/labels';
 import { IDisposable, toDisposable } from 'vs/base/common/lifecycle';
 import { Event, Emitter } from 'vs/base/common/event';
 import { ISCMService, ISCMProvider, ISCMInput, ISCMRepository, IInputValidator } from './scm';
+import { ILabelService } from 'vs/platform/label/common/label';
 import { ILogService } from 'vs/platform/log/common/log';
 import { equals } from 'vs/base/common/arrays';
 
@@ -86,17 +86,10 @@ class SCMRepository implements ISCMRepository {
 	private readonly _onDidChangeSelection = new Emitter<boolean>();
 	readonly onDidChangeSelection: Event<boolean> = this._onDidChangeSelection.event;
 
-	private _name = '';
-	get name(): string {
-		return this._name;
-	}
-
-	private readonly _onDidChangeName = new Emitter<string>();
-	readonly onDidChangeName: Event<string> = this._onDidChangeName.event;
-
 	readonly input: ISCMInput = new SCMInput();
 
 	constructor(
+		public readonly name: string,
 		public readonly provider: ISCMProvider,
 		private disposable: IDisposable
 	) { }
@@ -112,16 +105,6 @@ class SCMRepository implements ISCMRepository {
 
 		this._selected = selected;
 		this._onDidChangeSelection.fire(selected);
-	}
-
-
-	setName(name: string): void {
-		if (this._name === name) {
-			return;
-		}
-
-		this._name = name;
-		this._onDidChangeName.fire(name);
 	}
 
 	dispose(): void {
@@ -150,7 +133,10 @@ export class SCMService implements ISCMService {
 	private readonly _onDidRemoveProvider = new Emitter<ISCMRepository>();
 	readonly onDidRemoveRepository: Event<ISCMRepository> = this._onDidRemoveProvider.event;
 
-	constructor(@ILogService private readonly logService: ILogService) { }
+	constructor(
+		@ILogService private readonly logService: ILogService,
+		@ILabelService private readonly labelService: ILabelService
+	) { }
 
 	registerSCMProvider(provider: ISCMProvider): ISCMRepository {
 		this.logService.trace('SCMService#registerSCMProvider');
@@ -175,14 +161,18 @@ export class SCMService implements ISCMService {
 			this.onDidChangeSelection();
 		});
 
-		const repository = new SCMRepository(provider, disposable);
+		let name: string;
+		if (provider.rootUri) {
+			name = this.labelService.getUriLabel(provider.rootUri, { relative: true });
+		} else {
+			name = provider.label;
+		}
+
+		const repository = new SCMRepository(name, provider, disposable);
 		const selectedDisposable = repository.onDidChangeSelection(this.onDidChangeSelection, this);
 
 		this._repositories.push(repository);
 		this._onDidAddProvider.fire(repository);
-
-		const names = shorten(this.repositories.map(r => r.provider.rootUri?.path ?? r.provider.label));
-		this.repositories.forEach((r, i) => r.setName(names[i]));
 
 		return repository;
 	}
